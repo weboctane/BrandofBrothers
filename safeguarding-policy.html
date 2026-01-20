@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & Safeguarding - Band of Brothers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&display=swap" rel="stylesheet">
+
+  
+
+
+    <style>
+        body {
+    font-family: 'Cabin', Arial, sans-serif !important;
+}
+
+/* Specific elements ke liye bhi agar CSS override ho rahi ho */
+ input, textarea, a, h1, h2, h3 {
+    font-family: 'Cabin', Arial, sans-serif !important;
+}
+        .text-bob-blue { color: #1b5b88; }
+        .bg-bob-blue { background-color: #1b5b88; }
+        
+        /* Floating Labels inside box */
+        .floating-group { position: relative; }
+        .floating-input { padding-top: 1.5rem; padding-bottom: 0.5rem; transition: all 0.2s; }
+        .floating-label {
+            position: absolute; left: 0.75rem; top: 1rem;
+            transition: all 0.2s ease-in-out; pointer-events: none;
+            color: #1b5b88; font-size: 1rem;
+        }
+        .floating-input:focus ~ .floating-label,
+        .floating-input:not(:placeholder-shown) ~ .floating-label {
+            top: 0.4rem; font-size: 0.75rem; font-weight: 600;
+        }
+
+        /* Checkbox Shadow */
+        .custom-shadow-checkbox {
+            box-shadow: -3px 3px 0px rgba(0,0,0,0.1);
+            border: 1px solid #d1d5db;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800 antialiased">
+<!-- header -->
+ <div id="header-loader"></div>
+
+<script>
+  function initializeHeader() {
+    const topBar = document.getElementById('top-bar');
+    const header = document.getElementById('main-header');
+    const navWrapper = document.getElementById('nav-wrapper');
+    const logo = document.getElementById('header-logo');
+    const sidebar = document.getElementById('mobile-sidebar');
+
+    function updateHeaderStyle() {
+        if (!topBar || !header || !navWrapper || !logo) return;
+
+        const isMobile = window.innerWidth < 1024;
+        const scrollValue = window.scrollY;
+
+        // Transitions smooth karne ke liye
+        logo.style.transition = "transform 0.4s ease, height 0.4s ease";
+
+        if (scrollValue > 40) {
+           // --- SHRINK STATE (Scroll karne par) ---
+           topBar.style.transform = `translateY(-${topBar.offsetHeight}px)`;
+            header.style.top = '0px';
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+            header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)'; 
+
+            // Padding kam rakhein taake header sleek lage
+            navWrapper.style.paddingTop = isMobile ? '10px' : '15px';
+            navWrapper.style.paddingBottom = isMobile ? '10px' : '15px';
+            
+            // Scroll par logo normal size mein aa jayega
+            logo.style.height = isMobile ? '50px' : '65px'; 
+            logo.style.transform = 'scale(1)';
+        } else {
+            // --- TOP STATE (Initial Position) ---
+             topBar.style.transform = 'translateY(0)';
+            header.style.top = '14px';
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'; 
+            header.style.boxShadow = 'none';
+
+            if (isMobile) {
+                navWrapper.style.paddingTop = '40px';
+                navWrapper.style.paddingBottom = '1px';
+                logo.style.height = '100px';
+                logo.style.transform = 'scale(1)';
+            } else {
+                // DESKTOP: Padding ko narrow rakha hai (sirf 20px)
+                // Lekin scale(1.9) se logo ko bada dikhaya hai bina header stretch kiye
+                navWrapper.style.paddingTop = '50px'; 
+                navWrapper.style.paddingBottom = '50px';
+                
+                logo.style.height = '80px'; // Base height kam rakhi hai
+                logo.style.transformOrigin = 'left center'; // Logo left se expand hoga
+                logo.style.transform = 'scale(1.9)'; // Header height badhaye bina logo bada dikhega
+            }
+        }
+    }
+
+    // --- Desktop Click-to-Open Dropdown Logic ---
+    const triggers = document.querySelectorAll('.dropdown-trigger');
+    triggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            const menu = this.querySelector('.bob-dropdown');
+            const arrow = this.querySelector('.arrow-icon');
+            
+            if(!menu) return;
+
+            const isActive = menu.classList.contains('dropdown-active');
+
+            // Pehle baaki sab band karein
+            document.querySelectorAll('.bob-dropdown').forEach(m => m.classList.remove('dropdown-active'));
+            document.querySelectorAll('.arrow-icon').forEach(a => a.classList.remove('rotate-180'));
+
+            if (!isActive) {
+                menu.classList.add('dropdown-active');
+                if (arrow) arrow.classList.add('rotate-180');
+            }
+            e.stopPropagation();
+        });
+    });
+
+    // Bahar click karne par band karein
+    window.addEventListener('click', () => {
+        document.querySelectorAll('.bob-dropdown').forEach(m => m.classList.remove('dropdown-active'));
+        document.querySelectorAll('.arrow-icon').forEach(a => a.classList.remove('rotate-180'));
+    });
+
+    // --- Mobile Sidebar Logic ---
+    const openBtn = document.getElementById('open-sidebar');
+    const closeBtn = document.getElementById('close-sidebar');
+
+    if(openBtn && sidebar) {
+        openBtn.onclick = () => {
+            sidebar.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+    }
+    if(closeBtn && sidebar) {
+        closeBtn.onclick = () => {
+            sidebar.classList.remove('open');
+            document.body.style.overflow = 'auto';
+        };
+    }
+
+    // --- Mobile Sub-menu Logic ---
+    const mobAboutTrigger = document.getElementById('mobile-about-trigger');
+    const mobAboutMenu = document.getElementById('mobile-about-menu');
+    if(mobAboutTrigger) {
+        mobAboutTrigger.onclick = (e) => {
+            e.preventDefault();
+            mobAboutMenu.classList.toggle('show');
+        };
+    }
+
+    const mobEventsTrigger = document.getElementById('mobile-events-trigger');
+    const mobEventsMenu = document.getElementById('mobile-events-menu');
+    if(mobEventsTrigger) {
+        mobEventsTrigger.onclick = (e) => {
+            e.preventDefault();
+            mobEventsMenu.classList.toggle('show');
+        };
+    }
+
+    window.addEventListener('resize', updateHeaderStyle);
+    window.addEventListener('scroll', updateHeaderStyle);
+    updateHeaderStyle();
+}
+
+// --- Initialization Logic ---
+document.addEventListener('DOMContentLoaded', () => {
+    const loader = document.getElementById('header-loader');
+    if(loader) {
+        fetch('header1.html')
+            .then(res => res.text())
+            .then(data => {
+                loader.innerHTML = data;
+                setTimeout(initializeHeader, 100);
+            })
+            .catch(err => console.error("Header load failure:", err));
+    } else {
+        initializeHeader();
+    }
+});
+</script>
+    <!-- header -->
+    <main class="max-w-5xl mx-auto px-6 py-16">
+    
+        <section class="mt-32 pt-16 ">
+           <h2 class="text-center text-bob-blue text-[28px] md:text-5xl font-semibold uppercase mb-4 tracking-tight px-4">Safeguarding Policy</h2>
+            <div class="w-16 h-[2px] bg-gray-200 mb-12 mx-auto"></div>
+
+            <div class="max-w-4xl mx-auto space-y-8 md:px-20">
+                <div>
+                    <h4 class="underline mb-2 text-xl text-gray-600">Policy Statement</h4>
+                    <p class="text-gray-600 leading-relaxed text-xl ">
+                        ‘Band of Brothers CIC’ is committed to ensuring that all individuals, particularly children, young people and vulnerable adults at risk are protected from harm, abuse, neglect or exploitation. We believe everyone has the right to live free from abuse and to be treated with dignity and respect. We recognise our duty of care and the responsibility to safeguard and promote the welfare of all those who engage with our organisation’s activities, services, and events.
+                </div>
+
+                <div>
+                    <h4 class="underline mb-1 text-xl">Purpose of This Policy</h4>
+                    <p class="mb-0 text-xl">This policy aims to:</p>
+                    <ul class="list-disc ml-5 space-y-0 text-gray-700 text-xl">
+                        <li>Protect children, young people and adults at risk who engage with 'Band of Brothers CIC';</li>
+                        <li>Provide staff and volunteers with clear guidance on how to recognise and respond to safeguarding concerns;</li>
+                        <li>Outline our commitment to safe recruitment, training and reporting practices;</li>
+                        <li>Ensure compliance with relevant UK legislation and statutory guidance.</li>
+                    </ul>
+                </div>
+
+
+                
+                <div>
+                    <h4 class="underline mb-1 text-xl text-gray-600">Purpose of This Policy</h4>
+                    <p class="mb-0 text-xl">This policy aims to:</p>
+                    <ul class="list-disc ml-5 space-y-0 text-gray-600 text-xl">
+                        <li>Protect children, young people and adults at risk who engage with 'Band of Brothers CIC';</li>
+                        <li>Provide staff and volunteers with clear guidance on how to recognise and respond to safeguarding concerns;</li>
+                        <li>Outline our commitment to safe recruitment, training and reporting practices;</li>
+                        <li>Ensure compliance with relevant UK legislation and statutory guidance.</li>
+                    </ul>
+                </div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Legal Framework</h4>
+    <p class="mb-0 text-xl">This policy is based on legislation and guidance that seeks to protect children and adults, including:</p>
+    <ul class="list-disc ml-5 space-y-0 text-gray-700 text-xl">
+        <li>Children Act 1989 and 2004;</li>
+        <li>Working Together to Safeguard Children (2018);</li>
+        <li>Care Act 2014;</li>
+        <li>Safeguarding Vulnerable Groups Act 2006;</li>
+        <li>Data Protection Act 2018 / UK GDPR;</li>
+        <li>Domestic Abuse Act 2021;</li>
+        <li>Keeping Children Safe in Education (2023), where relevant.</li>
+    </ul>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Definitions</h4>
+    <p class="mb-0 text-xl">Safeguarding: Protecting a person’s right to live in safety, free from abuse and neglect.</p>
+    <p class="mb-0 text-xl">Child: Anyone under the age of 18.</p>
+    <p class="mb-0 text-xl">Adult at Risk: Anyone aged 18 or over who, because of their care and support needs, is unable to protect themselves from abuse or neglect.</p>
+    <p class="mb-0 text-xl">Abuse can include physical, emotional, sexual, financial, discriminatory, organisational, or neglect.</p>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Responsibilities</h4>
+    <h5 class="text-lg font-semibold">Organisation Responsibilities:</h5>
+    <ul class="list-disc ml-5 space-y-0 text-gray-600 text-xl">
+        <li>Promote a culture of zero tolerance towards abuse and harm;</li>
+        <li>Ensure all staff and volunteers understand their safeguarding responsibilities;</li>
+        <li>Provide ongoing safeguarding training and supervision;</li>
+        <li>Appoint a Designated Safeguarding Lead (DSL) to oversee safeguarding concerns.</li>
+    </ul>
+
+    <h5 class="text-lg font-semibold">Staff and Volunteer Responsibilities:</h5>
+    <ul class="list-disc ml-5 space-y-0 text-gray-600 text-xl">
+        <li>Report any safeguarding concern or disclosure immediately to the DSL;</li>
+        <li>Never promise confidentiality where abuse is disclosed;</li>
+        <li>Record and share information appropriately and securely;</li>
+        <li>Maintain professional boundaries at all times.</li>
+    </ul>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Designated Safeguarding Lead</h4>
+    <p class="mb-0 text-xl">Matthew Sunter</p>
+    <h4 class="underline mb-1 text-xl">Deputy Safeguarding Lead</h4>
+    <p class="mb-0 text-xl">Benjamin Singer</p>
+
+    <p class="mb-0 text-xl">The DSL is responsible for:</p>
+    <ul class="list-disc ml-5 space-y-0 text-gray-600 text-xl">
+        <li>Receiving and acting upon safeguarding concerns;</li>
+        <li>Liaising with local safeguarding partners (e.g. Local Authority Designated Officer – LADO);</li>
+        <li>Maintaining records of all safeguarding issues;</li>
+        <li>Ensuring all safeguarding policies and procedures are reviewed annually.</li>
+    </ul>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Recognising and Responding to Abuse</h4>
+    <p class="mb-0 text-xl">All staff and volunteers should be alert to signs of abuse, which may include:</p>
+    <ul class="list-disc ml-5 space-y-0 text-gray-600 text-xl">
+        <li>Unexplained injuries or changes in behaviour;</li>
+        <li>Withdrawal, anxiety, or fearfulness;</li>
+        <li>Poor personal hygiene or neglect;</li>
+        <li>Financial irregularities (for adults);</li>
+        <li>Inappropriate relationships or sexualised behaviour (for children).</li>
+    </ul>
+
+    <p class="mb-0 text-xl">If someone discloses abuse:</p>
+    <ul class="list-disc ml-5 space-y-0 text-gray-600 text-xl">
+        <li>Listen carefully and stay calm;</li>
+        <li>Do not promise confidentiality - explain you may need to share information to keep them safe;</li>
+        <li>Record what was said using their exact words;</li>
+        <li>Report immediately to the DSL or deputy DSL;</li>
+        <li>Do not investigate the concern yourself.</li>
+    </ul>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Reporting and Recording Procedures</h4>
+    <p class="mb-0 text-xl">Concerns must be reported to the DSL as soon as possible (and within 24 hours).</p>
+    <p class="mb-0 text-xl">The DSL will decide on next steps, which may include referral to:</p>
+    <ul class="list-disc ml-5 space-y-0 text-gray-600 text-xl">
+        <li>Children’s Social Care;</li>
+        <li>Adult Social Services;</li>
+        <li>Police (in cases of immediate danger).</li>
+    </ul>
+
+    <p class="mb-0 text-xl">All safeguarding records will be kept confidential and stored securely in compliance with data protection laws.</p>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Safer Recruitment</h4>
+    <p class="mb-0 text-xl">‘Band of Brothers CIC’ is committed to safe recruitment practices by:</p>
+    <ul class="list-disc ml-5 space-y-0 text-gray-700 text-xl">
+        <li>Requiring DBS checks for all staff and volunteers working with vulnerable groups;</li>
+        <li>Obtaining two references before employment or volunteering begins;</li>
+        <li>Conducting interviews and assessing applicants’ suitability for working with vulnerable individuals;</li>
+        <li>Providing safeguarding induction and ongoing training.</li>
+    </ul>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Training</h4>
+    <p class="mb-0 text-xl">All staff, trustees, and volunteers must:</p>
+    <ul class="list-disc ml-5 space-y-0 text-gray-700 text-xl">
+        <li>Complete safeguarding training at induction;</li>
+        <li>Attend refresher training every [e.g. 2 years];</li>
+        <li>Understand how to recognise, respond, and record safeguarding concerns.</li>
+    </ul>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Code of Conduct</h4>
+    <p class="mb-0 text-xl">All staff and volunteers must:</p>
+    <ul class="list-disc ml-5 space-y-0 text-gray-700 text-xl">
+        <li>Treat everyone with dignity and respect;</li>
+        <li>Maintain appropriate professional boundaries;</li>
+        <li>Avoid situations that could be misinterpreted;</li>
+        <li>Never engage in sexual, abusive or exploitative behaviour.</li>
+    </ul>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Whistleblowing</h4>
+    <p class="mb-0 text-xl">Staff and volunteers are encouraged to report concerns about colleagues or organisational practices that may put others at risk.</p>
+    <p class="mb-0 text-xl">Reports can be made to the DSL, the Chair of Trustees, or directly to the Local Authority Designated Officer (LADO).</p>
+    <p class="mb-0 text-xl">Whistleblowers will be protected under the Public Interest Disclosure Act 1998.</p>
+</div>
+
+<div>
+    <h4 class="underline mb-1 text-xl">Policy Review</h4>
+    <p class="mb-0 text-xl">This policy will be reviewed annually, or sooner, if:</p>
+    <ul class="list-disc ml-5 space-y-0 text-gray-700 text-xl">
+        <li>There are changes to legislation;</li>
+        <li>There is a safeguarding incident;</li>
+        <li>There are organisational changes impacting safeguarding responsibilities.</li>
+    </ul>
+
+    <p class="mb-0 mt-5 text-xl">Date Approved: November 2025</p>
+    <p class="mb-0 text-xl">Next Review Due November 2026</p>
+    <p class="mb-0 text-xl">Approved By: Jim Cirkel (Executive Director)</p>
+</div>
+
+                
+            </div>
+        </section>
+    </main>
+ <footer class="w-full bg-[#335E90] text-white py-16 px-6">
+    <div class="max-w-[1200px] mx-auto flex flex-col items-center text-center">
+        
+        <div class="flex flex-wrap justify-center gap-4 md:gap-10 text-[13px] md:text-[15px]  uppercase tracking-widest mb-12">
+            <a href="safeguarding-policy.html" class="hover:opacity-80 transition-opacity">Safeguarding Policy</a>
+            <a href="policy.html" class="hover:opacity-80 transition-opacity">EQ&I Policy</a>
+            <a href="safety-policy.html" class="hover:opacity-80 transition-opacity">Health & Safety Policy</a>
+        </div>
+
+  <div class="flex items-center gap-6 mb-12">
+
+  <a href="https://www.facebook.com/bandofbrotherscic/"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-facebook-f text-sm"></i>
+  </a>
+
+  <a href="https://www.instagram.com/bandofbrotherscic/#"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-instagram text-sm"></i>
+  </a>
+
+  <a href="https://www.linkedin.com/company/band-of-brothers-cic/"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-linkedin-in text-sm"></i>
+  </a>
+
+</div>
+
+
+        <p class="text-[13px] md:text-[16px] leading-relaxed max-w-[1150px] mb-8 opacity-90">
+           <em>'Band of Brothers Community Interest Company'</em>
+ is a registered company with 'Companies House' (in England and Wales) 
+            and is approved by the 'CIC Regulator' [Company Registration: 16528876].
+        </p>
+
+        <div class="text-[12px] md:text-[15px] italic">
+            <p class="mb-1 text-medium italic ">Copyright © 2026. 'Band of Brothers CIC'.</p>
+            <p class="mb-1 text-medium italic ">All Rights Reserved.</p>
+        </div>
+
+    </div>
+</footer>
+</body>
+</html>

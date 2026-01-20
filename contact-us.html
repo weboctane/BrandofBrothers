@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Band of Brothers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+ <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&display=swap" rel="stylesheet">
+
+  
+
+
+    <style>
+        body {
+    font-family: 'Cabin', Arial, sans-serif !important;
+}
+
+/* Specific elements ke liye bhi agar CSS override ho rahi ho */
+ input, textarea, a, h1, h2, h3 {
+    font-family: 'Cabin', Arial, sans-serif !important;
+}
+
+        .text-bob-blue { color: #1b5b88; }
+        .bg-bob-blue { background-color: #1b5b88; }
+        
+        /* Floating Group Container */
+        .floating-group {
+            position: relative;
+            background: transparent;
+        }
+
+        /* Input field styling */
+        .floating-input {
+            padding-top: 1.5rem; /* Text ke liye upar jagah banai taaki label andar rahe */
+            padding-bottom: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Label styling (Andar hi rahega) */
+        .floating-label {
+            position: absolute;
+            left: 0.75rem;
+            top: 1rem; /* Default position box ke beech mein */
+            transition: all 0.2s ease-in-out;
+            pointer-events: none;
+            color: #000;
+            font-size: 1rem;
+        }
+
+        /* Select karne par label box ke ANDAR hi upar move ho jaye */
+        .floating-input:focus ~ .floating-label,
+        .floating-input:not(:placeholder-shown) ~ .floating-label {
+            top: 0.4rem; /* Box ke andar top area */
+            font-size: 0.75rem; /* Chota size */
+            color: #666;
+            font-weight: 600;
+        }
+
+        /* Placeholder hide karne ke liye jab tak focus na ho */
+        .floating-input::placeholder {
+            color: transparent;
+        }
+        
+        /* Custom Checkbox Styling */
+    .custom-checkbox {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #d1d5db;
+        border-radius: 2px;
+        background-color: white;
+        cursor: pointer;
+        position: relative;
+        /* Bottom aur Left shadow: x-axis (-2px) aur y-axis (2px) */
+        box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.15); 
+        transition: all 0.2s ease;
+    }
+
+    /* Check hone par color aur tick mark */
+    .custom-checkbox:checked {
+        background-color: #1b5b88;
+        border-color: #1b5b88;
+    }
+
+    .custom-checkbox:checked::after {
+        content: '\f00c'; /* FontAwesome Tick */
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: white;
+        font-size: 11px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);}
+    </style>
+</head>
+
+<body class="bg-white font-sans text-gray-700 antialiased">
+ <div id="header-loader"></div>
+
+<script>
+  function initializeHeader() {
+    const topBar = document.getElementById('top-bar');
+    const header = document.getElementById('main-header');
+    const navWrapper = document.getElementById('nav-wrapper');
+    const logo = document.getElementById('header-logo');
+    const sidebar = document.getElementById('mobile-sidebar');
+
+    function updateHeaderStyle() {
+        if (!topBar || !header || !navWrapper || !logo) return;
+
+        const isMobile = window.innerWidth < 1024;
+        const scrollValue = window.scrollY;
+
+        // Transitions smooth karne ke liye
+        logo.style.transition = "transform 0.4s ease, height 0.4s ease";
+
+        if (scrollValue > 40) {
+            // --- SHRINK STATE (Scroll karne par) ---
+           topBar.style.transform = `translateY(-${topBar.offsetHeight}px)`;
+            header.style.top = '0px';
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+            header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)'; 
+
+            // Padding kam rakhein taake header sleek lage
+            navWrapper.style.paddingTop = isMobile ? '10px' : '15px';
+            navWrapper.style.paddingBottom = isMobile ? '10px' : '15px';
+            
+            // Scroll par logo normal size mein aa jayega
+            logo.style.height = isMobile ? '50px' : '65px'; 
+            logo.style.transform = 'scale(1)';
+        } else {
+            // --- TOP STATE (Initial Position) ---
+             topBar.style.transform = 'translateY(0)';
+            header.style.top = '14px';
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'; 
+            header.style.boxShadow = 'none';
+
+            if (isMobile) {
+                navWrapper.style.paddingTop = '40px';
+                navWrapper.style.paddingBottom = '1px';
+                logo.style.height = '100px';
+                logo.style.transform = 'scale(1)';
+            } else {
+                // DESKTOP: Padding ko narrow rakha hai (sirf 20px)
+                // Lekin scale(1.9) se logo ko bada dikhaya hai bina header stretch kiye
+                navWrapper.style.paddingTop = '50px'; 
+                navWrapper.style.paddingBottom = '50px';
+                
+                logo.style.height = '80px'; // Base height kam rakhi hai
+                logo.style.transformOrigin = 'left center'; // Logo left se expand hoga
+                logo.style.transform = 'scale(1.9)'; // Header height badhaye bina logo bada dikhega
+            }
+        }
+    }
+
+    // --- Desktop Click-to-Open Dropdown Logic ---
+    const triggers = document.querySelectorAll('.dropdown-trigger');
+    triggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            const menu = this.querySelector('.bob-dropdown');
+            const arrow = this.querySelector('.arrow-icon');
+            
+            if(!menu) return;
+
+            const isActive = menu.classList.contains('dropdown-active');
+
+            // Pehle baaki sab band karein
+            document.querySelectorAll('.bob-dropdown').forEach(m => m.classList.remove('dropdown-active'));
+            document.querySelectorAll('.arrow-icon').forEach(a => a.classList.remove('rotate-180'));
+
+            if (!isActive) {
+                menu.classList.add('dropdown-active');
+                if (arrow) arrow.classList.add('rotate-180');
+            }
+            e.stopPropagation();
+        });
+    });
+
+    // Bahar click karne par band karein
+    window.addEventListener('click', () => {
+        document.querySelectorAll('.bob-dropdown').forEach(m => m.classList.remove('dropdown-active'));
+        document.querySelectorAll('.arrow-icon').forEach(a => a.classList.remove('rotate-180'));
+    });
+
+    // --- Mobile Sidebar Logic ---
+    const openBtn = document.getElementById('open-sidebar');
+    const closeBtn = document.getElementById('close-sidebar');
+
+    if(openBtn && sidebar) {
+        openBtn.onclick = () => {
+            sidebar.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+    }
+    if(closeBtn && sidebar) {
+        closeBtn.onclick = () => {
+            sidebar.classList.remove('open');
+            document.body.style.overflow = 'auto';
+        };
+    }
+
+    // --- Mobile Sub-menu Logic ---
+    const mobAboutTrigger = document.getElementById('mobile-about-trigger');
+    const mobAboutMenu = document.getElementById('mobile-about-menu');
+    if(mobAboutTrigger) {
+        mobAboutTrigger.onclick = (e) => {
+            e.preventDefault();
+            mobAboutMenu.classList.toggle('show');
+        };
+    }
+
+    const mobEventsTrigger = document.getElementById('mobile-events-trigger');
+    const mobEventsMenu = document.getElementById('mobile-events-menu');
+    if(mobEventsTrigger) {
+        mobEventsTrigger.onclick = (e) => {
+            e.preventDefault();
+            mobEventsMenu.classList.toggle('show');
+        };
+    }
+
+    window.addEventListener('resize', updateHeaderStyle);
+    window.addEventListener('scroll', updateHeaderStyle);
+    updateHeaderStyle();
+}
+
+// --- Initialization Logic ---
+document.addEventListener('DOMContentLoaded', () => {
+    const loader = document.getElementById('header-loader');
+    if(loader) {
+        fetch('header1.html')
+            .then(res => res.text())
+            .then(data => {
+                loader.innerHTML = data;
+                setTimeout(initializeHeader, 100);
+            })
+            .catch(err => console.error("Header load failure:", err));
+    } else {
+        initializeHeader();
+    }
+});
+</script>
+    <main class="max-w-7xl mx-auto px-10 py-16 mt-48 md:mt-48">
+     <h1 class="text-center text-bob-blue text-3xl md:text-5xl font-semibold uppercase mb-5">
+    Contact Us
+</h1>
+        <div class="w-10 h-[1px] bg-gray-300 mb-12 mx-auto"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-10">
+            
+            <div>
+                <h2 class="text-black text-[22px] md:text-[24px] mb-8 ">
+                    Send us a message today!
+                </h2>
+
+                <form action="upload.php" method="POST" enctype="multipart/form-data" class="space-y-10">
+                    
+                    <div class="floating-group">
+                        <input type="text" name="name" id="name" placeholder=" " required
+                            class="peer floating-input w-full border border-gray-300 px-3 rounded-sm outline-none focus:border-black focus:ring-0 bg-transparent text-black">
+                        <label for="name" class="floating-label">Name*</label>
+                    </div>
+
+                    <div class="floating-group">
+                        <input type="text" name="telephone" id="telephone" placeholder=" " required
+                            class="peer floating-input w-full border border-gray-300 px-3 rounded-sm outline-none focus:border-black focus:ring-0 bg-transparent text-black">
+                        <label for="telephone" class="floating-label">Telephone Number*</label>
+                    </div>
+
+                    <div class="floating-group">
+                        <input type="email" name="email" id="email" placeholder=" " required
+                            class="peer floating-input w-full border border-gray-300 px-3 rounded-sm outline-none focus:border-black focus:ring-0 bg-transparent text-black">
+                        <label for="email" class="floating-label">Email*</label>
+                    </div>
+
+                    <div class="floating-group">
+                        <textarea name="message" id="message" rows="5" placeholder=" " required
+                            class="peer floating-input w-full border border-gray-300 px-3 rounded-sm outline-none focus:border-black focus:ring-0 bg-transparent text-black"></textarea>
+                        <label for="message" class="floating-label">What would you like to share with us?*</label>
+                    </div>
+
+                    <div class="flex items-center justify-between text-lg text-[#4D6B89] py-0">
+                        <label for="fileToUpload" class="hover:underline cursor-pointer">
+                            <i class="fa-solid fa-paperclip mr-1 "></i> Attach Files
+                        </label>
+                        <input type="file" id="fileToUpload" name="fileToUpload" class="hidden" />
+                        <span class="text-gray-400 ">Attachments (0)</span>
+                    </div>
+
+                   <div class="flex items-start space-x-3 text-lg text-gray-500 mt-4">
+    <input type="checkbox" class="custom-checkbox mt-1" name="subscribe" id="subscribe">
+    <label for="subscribe" class="cursor-pointer leading-tight">
+        Sign up for the latest updates, promotions, and more.
+    </label>
+</div>
+
+                    <button type="submit" class="w-full bg-bob-blue text-white font-bold py-3 uppercase tracking-widest rounded-full hover:opacity-90 transition shadow-md">Send</button>
+                    
+                    <p class="text-[16px] text-gray-800  leading-tight ">
+                        This site is protected by reCAPTCHA and the Google <a href="#" class=" text-[#335E90]">Privacy Policy</a> and <a href="#" class="text-[#335E90]">Terms of Service</a> apply.
+                    </p>
+                </form>
+            </div>
+
+          <div class="space-y-6 text-center md:text-left flex flex-col items-center md:items-start">
+    
+    <div class="w-full">
+        <h2 class="text-black text-[22px] md:text-[24px] mb-6">'Band of Brothers Community Interest Company'</h2>
+        <p class="text-medium leading-relaxed mb-6 text-gray-600 max-w-[500px] mx-auto md:mx-0">
+            We'd love to hear from you, so please feel free to drop us a message by completing our form, or you can find our contact details below:
+        </p>
+        
+        <div class="flex justify-center md:justify-start">
+            <a href="#" class="inline-flex items-center bg-[#4F6672] text-[#ffffff] px-9 py-3 rounded-full text-lg font-semibold hover:bg-[#566d79] transition-colors shadow-sm">
+                <i class="fa-brands fa-whatsapp text-[#25D366] text-xl mr-2"></i>
+                Drop us a WhatsApp!
+            </a>
+        </div>
+    </div>
+
+    <div class="space-y-4 w-full">
+        <h3 class="text-black text-[22px] md:text-[25px] mb-4 mt-4">Contact us today:</h3>
+        <p class="text-lg">7 Threadey Way, Sutton SM1 4AF, UK</p>
+        
+        <div class="pt-4">
+            <p class="text-[18px] mb-3 font-medium">Telephone Numbers:</p>
+            <div class="text-[18px] leading-relaxed text-gray-800 space-y-1">
+                <p>General Enquiries – <a href="tel:02080586567" class="hover:underline text-[#4D6B89]">02080586567</a></p>
+                <p>WhatsApp – <a href="tel:07457411700" class="hover:underline text-[#4D6B89]">07457411700</a></p>
+                <p class="text-gray-800 ">Support Line – "Coming Soon"</p>
+            </div>
+        </div>
+
+        <p class="text-[18px] pt-4">
+            Email: <a href="mailto:hello@bob-cic.org.uk" class="text-[#4D6B89] hover:underline">hello@bob-cic.org.uk</a>
+        </p>
+    </div>
+
+    <div class="pt-6 w-full flex flex-col items-center md:items-start">
+        <h3 class="text-black text-[22px] mb-2">Our Office Opening Hours are:</h3>
+        
+        <div class="relative inline-block w-full max-w-[300px]">
+            <button onclick="toggleOpeningHours()" class="flex items-center justify-between w-full py-2 text-[20px] text-dark focus:outline-none">
+                <span>Open today 08:00 – 17:00</span>
+                <i id="hoursChevron" class="fa-solid fa-chevron-down text-[12px] transition-transform duration-300 ml-2"></i>
+            </button>
+
+            <div id="openingHoursList" class="hidden mt-2 space-y-1 text-black text-[18px] animate-fadeIn">
+                <div class="flex justify-between gap-4"><span>Mon</span> <span>08:00 – 17:00</span></div>
+                <div class="flex justify-between gap-4"><span>Tue</span> <span>08:00 – 17:00</span></div>
+                <div class="flex justify-between gap-4"><span>Wed</span> <span>08:00 – 17:00</span></div>
+                <div class="flex justify-between gap-4"><span>Thu</span> <span>08:00 – 17:00</span></div>
+                <div class="flex justify-between gap-4 font-bold text-gray-900"><span>Fri</span> <span>08:00 – 17:00</span></div>
+                <div class="flex justify-between gap-4 text-gray-900"><span>Sat</span> <span>Closed</span></div>
+                <div class="flex justify-between gap-4 text-gray-900"><span>Sun</span> <span>Closed</span></div>
+            </div>
+        </div>
+
+        <p class="text-[15px] text-gray-500 mt-6 leading-relaxed max-w-[450px] mx-auto md:mx-0">
+            While our operational office hours are typical of a business/non-profit, 
+            we host a variety of Events that are often held over evenings and weekends.
+        </p>
+    </div>
+</div>
+        </div>
+    </main>
+
+    <div class="w-full h-[450px] bg-gray-100 relative mt-16">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2490.1!2d-0.1!3d51.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTHCsDE4JzAwLjAiTiAwwrAwNicwMC4wIlc!5e0!3m2!1sen!2suk!4v123456789" 
+            class="w-full h-full grayscale-[20%]" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        <a href="#" class="rounded-full absolute top-4 left-4 bg-[#1b5b88] text-white text-xs px-4 py-2 font-bold flex items-center shadow-lg uppercase">
+            <i class="fa-solid fa-directions mr-2"></i> Get Directions
+        </a>
+    </div>
+
+    <footer class="bg-[#111] text-white py-20 px-6">
+        <div class="max-w-4xl mx-auto">
+          <h2 class="text-left md:text-center text-bob-blue text-3xl md:text-5xl font-semibold uppercase tracking-wider mb-6">
+    Legal Information
+</h2>
+            <div class="w-10 h-[1px] bg-gray-700 mb-12 mx-auto"></div>
+            
+            <div class="space-y-8 text-lg text-gray-400 leading-relaxed">
+                <p class="text-white text-2xl ">Please see Legal Information pertaining to 'Band of Brothers CIC', as follows:</p>
+                <p>'Band of Brothers Community Interest Company' is a registered company with Companies House (in England and Wales) and is approved by the CIC Regulator - Company Registration: 16528876.
+
+</p>
+                <p>The logo and 'Band of Brothers CIC' name are registered trademarks. The use of any of our logos or trademarks on any document, or in association with any information, signifies that the material has been prepared or approved by 'Band of Brothers CIC'. No permission is granted for the use of our logos, nor will reproduction in any form be allowed, without our express prior written consent. To request permission, please contact us.</p>
+                <p>'Band of Brothers CIC' are also registered with the Information Commissioners Office (ICO), governing the principles of how we hold public information. 
+
+</p>
+                <p>'Band of Brothers CIC' have both 'Public Liability insurance' and 'Trustee Indemnity Insurance' to safeguard our organisation, members and trustees. All of our volunteers and trustees undergo appropriate background checks, in line with 'Charity Commission guidance' and 'DBS eligibility criteria'.</p>
+            </div>
+        </div>
+    </footer>
+
+
+  <footer class="w-full bg-[#335E90] text-white py-16 px-6">
+    <div class="max-w-[1200px] mx-auto flex flex-col items-center text-center">
+        
+        <div class="flex flex-wrap justify-center gap-4 md:gap-10 text-[13px] md:text-[15px]  uppercase tracking-widest mb-12">
+            <a href="safeguarding-policy.html" class="hover:opacity-80 transition-opacity">Safeguarding Policy</a>
+            <a href="policy.html" class="hover:opacity-80 transition-opacity">EQ&I Policy</a>
+            <a href="safety-policy.html" class="hover:opacity-80 transition-opacity">Health & Safety Policy</a>
+        </div>
+
+  <div class="flex items-center gap-6 mb-12">
+
+  <a href="https://www.facebook.com/bandofbrotherscic/"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-facebook-f text-sm"></i>
+  </a>
+
+  <a href="https://www.instagram.com/bandofbrotherscic/#"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-instagram text-sm"></i>
+  </a>
+
+  <a href="https://www.linkedin.com/company/band-of-brothers-cic/"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-linkedin-in text-sm"></i>
+  </a>
+
+</div>
+
+
+        <p class="text-[13px] md:text-[16px] leading-relaxed max-w-[1150px] mb-8 opacity-90">
+           <em>'Band of Brothers Community Interest Company'</em>
+ is a registered company with 'Companies House' (in England and Wales) 
+            and is approved by the 'CIC Regulator' [Company Registration: 16528876].
+        </p>
+
+        <div class="text-[12px] md:text-[15px] italic">
+            <p class="mb-1 text-medium italic ">Copyright © 2026. 'Band of Brothers CIC'.</p>
+            <p class="mb-1 text-medium italic ">All Rights Reserved.</p>
+        </div>
+
+    </div>
+</footer>
+</body>
+</html>

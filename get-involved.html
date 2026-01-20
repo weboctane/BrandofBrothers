@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story - Band of Brothers CIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&display=swap" rel="stylesheet">
+
+  
+
+
+    <style>
+        body {
+    font-family: 'Cabin', Arial, sans-serif !important;
+}
+
+/* Specific elements ke liye bhi agar CSS override ho rahi ho */
+ input, textarea, a, h1, h2, h3 {
+    font-family: 'Cabin', Arial, sans-serif !important;
+}
+
+        /* 2. Alternating Backgrounds ka logic */
+        .pledge-row:nth-child(even) { background-color: #f6f6f6; }
+        .pledge-row:nth-child(odd) { background-color: #ffffff; }
+        
+        /* Smooth transitions */
+        section { transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="bg-white font-sans">
+<!-- header -->
+ <div id="header-loader"></div>
+
+<script>
+  function initializeHeader() {
+    const topBar = document.getElementById('top-bar');
+    const header = document.getElementById('main-header');
+    const navWrapper = document.getElementById('nav-wrapper');
+    const logo = document.getElementById('header-logo');
+    const sidebar = document.getElementById('mobile-sidebar');
+
+    function updateHeaderStyle() {
+        if (!topBar || !header || !navWrapper || !logo) return;
+
+        const isMobile = window.innerWidth < 1024;
+        const scrollValue = window.scrollY;
+
+        // Transitions smooth karne ke liye
+        logo.style.transition = "transform 0.4s ease, height 0.4s ease";
+
+        if (scrollValue > 40) {
+               // --- SHRINK STATE (Scroll karne par) ---
+           topBar.style.transform = `translateY(-${topBar.offsetHeight}px)`;
+            header.style.top = '0px';
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+            header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)'; 
+
+            // Padding kam rakhein taake header sleek lage
+            navWrapper.style.paddingTop = isMobile ? '10px' : '15px';
+            navWrapper.style.paddingBottom = isMobile ? '10px' : '15px';
+            
+            // Scroll par logo normal size mein aa jayega
+            logo.style.height = isMobile ? '50px' : '65px'; 
+            logo.style.transform = 'scale(1)';
+        } else {
+            // --- TOP STATE (Initial Position) ---
+             topBar.style.transform = 'translateY(0)';
+            header.style.top = '14px';
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'; 
+            header.style.boxShadow = 'none';
+
+
+            if (isMobile) {
+                navWrapper.style.paddingTop = '40px';
+                navWrapper.style.paddingBottom = '1px';
+                logo.style.height = '100px';
+                logo.style.transform = 'scale(1)';
+            } else {
+                // DESKTOP: Padding ko narrow rakha hai (sirf 20px)
+                // Lekin scale(1.9) se logo ko bada dikhaya hai bina header stretch kiye
+                navWrapper.style.paddingTop = '50px'; 
+                navWrapper.style.paddingBottom = '50px';
+                
+                logo.style.height = '80px'; // Base height kam rakhi hai
+                logo.style.transformOrigin = 'left center'; // Logo left se expand hoga
+                logo.style.transform = 'scale(1.9)'; // Header height badhaye bina logo bada dikhega
+            }
+        }
+    }
+
+    // --- Desktop Click-to-Open Dropdown Logic ---
+    const triggers = document.querySelectorAll('.dropdown-trigger');
+    triggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            const menu = this.querySelector('.bob-dropdown');
+            const arrow = this.querySelector('.arrow-icon');
+            
+            if(!menu) return;
+
+            const isActive = menu.classList.contains('dropdown-active');
+
+            // Pehle baaki sab band karein
+            document.querySelectorAll('.bob-dropdown').forEach(m => m.classList.remove('dropdown-active'));
+            document.querySelectorAll('.arrow-icon').forEach(a => a.classList.remove('rotate-180'));
+
+            if (!isActive) {
+                menu.classList.add('dropdown-active');
+                if (arrow) arrow.classList.add('rotate-180');
+            }
+            e.stopPropagation();
+        });
+    });
+
+    // Bahar click karne par band karein
+    window.addEventListener('click', () => {
+        document.querySelectorAll('.bob-dropdown').forEach(m => m.classList.remove('dropdown-active'));
+        document.querySelectorAll('.arrow-icon').forEach(a => a.classList.remove('rotate-180'));
+    });
+
+    // --- Mobile Sidebar Logic ---
+    const openBtn = document.getElementById('open-sidebar');
+    const closeBtn = document.getElementById('close-sidebar');
+
+    if(openBtn && sidebar) {
+        openBtn.onclick = () => {
+            sidebar.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+    }
+    if(closeBtn && sidebar) {
+        closeBtn.onclick = () => {
+            sidebar.classList.remove('open');
+            document.body.style.overflow = 'auto';
+        };
+    }
+
+    // --- Mobile Sub-menu Logic ---
+    const mobAboutTrigger = document.getElementById('mobile-about-trigger');
+    const mobAboutMenu = document.getElementById('mobile-about-menu');
+    if(mobAboutTrigger) {
+        mobAboutTrigger.onclick = (e) => {
+            e.preventDefault();
+            mobAboutMenu.classList.toggle('show');
+        };
+    }
+
+    const mobEventsTrigger = document.getElementById('mobile-events-trigger');
+    const mobEventsMenu = document.getElementById('mobile-events-menu');
+    if(mobEventsTrigger) {
+        mobEventsTrigger.onclick = (e) => {
+            e.preventDefault();
+            mobEventsMenu.classList.toggle('show');
+        };
+    }
+
+    window.addEventListener('resize', updateHeaderStyle);
+    window.addEventListener('scroll', updateHeaderStyle);
+    updateHeaderStyle();
+}
+
+// --- Initialization Logic ---
+document.addEventListener('DOMContentLoaded', () => {
+    const loader = document.getElementById('header-loader');
+    if(loader) {
+        fetch('header1.html')
+            .then(res => res.text())
+            .then(data => {
+                loader.innerHTML = data;
+                setTimeout(initializeHeader, 100);
+            })
+            .catch(err => console.error("Header load failure:", err));
+    } else {
+        initializeHeader();
+    }
+});
+</script>
+    <!-- header -->
+
+<section class="w-full max-w-[1200px] mx-auto mt-64 md:mt-64 px-4 md:px-0 overflow-hidden">
+    
+    <div class="text-center mb-10 md:mb-12">
+        <h2 class="text-3xl md:text-[2.5rem] font-semibold text-[#3a6699] uppercase leading-tight px-2">
+            WANT TO SUPPORT 'BAND OF BROTHERS'?
+        </h2>
+    </div>
+
+    <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-8 md:gap-12 px-4 md:px-10">
+        
+        <div class="w-full md:w-2/5 flex justify-center items-start order-1 md:order-2">
+            <img src="../images/together.webp" 
+                 alt="Together Everyone Achieves More" 
+                 class="w-[80%] md:w-full max-w-[320px] md:max-w-[400px] h-auto object-contain">
+        </div>
+
+        <div class="w-full md:w-3/5 order-2 md:order-1">
+            <h3 class="text-xl md:text-2xl font-semibold text-gray-600 mb-6 text-center md:text-left">
+                Join Us in Strengthening Men’s Mental Health Support
+            </h3>
+            
+            <div class="text-lg text-gray-500 space-y-6">
+                <p>
+                    At <span class="italic">'The Band of Brothers CIC'</span>, we believe no man should have to fight his battles alone. Through a collaborative approach, we work together to break down the stigma and build stronger support networks for men’s mental health.
+                </p>
+                <p>
+                    As we continue to grow and deliver on our mission, we’re looking to connect with individuals who can bring their skills and passion to the cause. We are currently seeking:
+                </p>
+
+                <ul class="list-disc pl-6 space-y-2 text-gray-600">
+                    <li><span class="font-semibold">Charity Trustees</span> - finance and governance experience</li>
+                    <li><span class="font-semibold">Freelance Graphic Designers</span></li>
+                    <li><span class="font-semibold">Website and SEO specialists</span></li>
+                    <li><span class="font-semibold">Social Media experts</span></li>
+                    <li><span class="font-semibold">'Chapter Champions'</span> - volunteer Walk Leaders</li>
+                </ul>
+
+                <p class="pt-4 font-medium text-gray-700">
+                    If you’re interested in making a real difference, we’d love to hear from you.
+                </p>
+                
+                <p class="text-[#3a6699] font-semibold">
+                    👉 Please get in touch and send us your CV to explore how you can help.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full max-w-[1300px] mx-auto px-4 md:px-10 mt-12 mb-10 border-t pt-6">
+        <p class="text-lg font-bold text-[#494848] text-center md:text-left uppercase tracking-wider">
+            Together, we are stronger.
+        </p>
+    </div>
+</section>
+
+
+
+<!-- cta -->
+<footer class="w-full bg-[#696969] text-white py-16 px-6">
+    <div class="max-w-[1200px] mx-auto flex flex-col items-center text-center">
+        
+        <h3 class="text-xl md:text-5xl font-semibold uppercase  mb-2 ">
+            Follow the 'Band of Brothers' today:
+        </h3>
+<div class="w-10 h-0.5 bg-white mx-auto my-6 opacity-40"></div>
+ <div class="flex items-center gap-10 mb-6 mt-6">
+
+  <a href="#"
+     class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-[#696969] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-facebook-f text-2xl"></i>
+  </a>
+
+  <a href="#"
+     class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-[#696969] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-instagram text-2xl"></i>
+  </a>
+
+  <a href="#"
+     class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-[#696969] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-linkedin-in text-2xl"></i>
+  </a>
+
+</div>
+        
+    </div>
+</footer>
+ <!-- cta -->
+ <footer class="w-full bg-[#335E90] text-white py-16 px-6">
+    <div class="max-w-[1200px] mx-auto flex flex-col items-center text-center">
+        
+        <div class="flex flex-wrap justify-center gap-4 md:gap-10 text-[13px] md:text-[15px]  uppercase tracking-widest mb-12">
+            <a href="safeguarding-policy.html" class="hover:opacity-80 transition-opacity">Safeguarding Policy</a>
+            <a href="policy.html" class="hover:opacity-80 transition-opacity">EQ&I Policy</a>
+            <a href="safety-policy.html" class="hover:opacity-80 transition-opacity">Health & Safety Policy</a>
+        </div>
+
+  <div class="flex items-center gap-6 mb-12">
+
+  <a href="https://www.facebook.com/bandofbrotherscic/"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-facebook-f text-sm"></i>
+  </a>
+
+  <a href="https://www.instagram.com/bandofbrotherscic/#"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-instagram text-sm"></i>
+  </a>
+
+  <a href="https://www.linkedin.com/company/band-of-brothers-cic/"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-linkedin-in text-sm"></i>
+  </a>
+
+</div>
+
+
+        <p class="text-[13px] md:text-[16px] leading-relaxed max-w-[1150px] mb-8 opacity-90">
+           <em>'Band of Brothers Community Interest Company'</em>
+ is a registered company with 'Companies House' (in England and Wales) 
+            and is approved by the 'CIC Regulator' [Company Registration: 16528876].
+        </p>
+
+        <div class="text-[12px] md:text-[15px] italic">
+            <p class="mb-1 text-medium italic ">Copyright © 2026. 'Band of Brothers CIC'.</p>
+            <p class="mb-1 text-medium italic ">All Rights Reserved.</p>
+        </div>
+
+    </div>
+</footer>
+</body>
+</html>

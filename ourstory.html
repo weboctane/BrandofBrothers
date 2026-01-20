@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Story Band of Brothers CIC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+  
+
+
+    <style>
+        body {
+    font-family: 'Cabin', Arial, sans-serif !important;
+}
+
+/* Specific elements ke liye bhi agar CSS override ho rahi ho */
+ input, textarea, a, h1, h2, h3 {
+    font-family: 'Cabin', Arial, sans-serif !important;
+}
+    .noScrollBar::-webkit-scrollbar { display: none; }
+    .noScrollBar { -ms-overflow-style: none; scrollbar-width: none; }
+    /* Specific elements ke liye bhi agar CSS override ho rahi ho */
+ input, textarea, a, h1, h2, h3 {
+    font-family: 'Cabin', Arial, sans-serif !important;
+}
+/* Mobile par thumbnails (thumbRow) hide karne ke liye */
+@media (max-width: 768px) {
+    #thumbRow {
+        display: none !important;
+    }
+    /* Caption ki spacing adjust karne ke liye */
+    #caption {
+        margin-top: 10px;
+        font-size: 13px;
+    }
+}
+
+/* Scrollbar hide karne ke liye utility */
+.noScrollBar::-webkit-scrollbar {
+    display: none;
+}
+.noScrollBar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+  </style>
+</head>
+
+<body class="bg-white text-black">
+
+</head>
+<body class="bg-gray-50">
+ <div id="header-loader"></div>
+
+<script>
+  function initializeHeader() {
+    const topBar = document.getElementById('top-bar');
+    const header = document.getElementById('main-header');
+    const navWrapper = document.getElementById('nav-wrapper');
+    const logo = document.getElementById('header-logo');
+    const sidebar = document.getElementById('mobile-sidebar');
+
+    function updateHeaderStyle() {
+        if (!topBar || !header || !navWrapper || !logo) return;
+
+        const isMobile = window.innerWidth < 1024;
+        const scrollValue = window.scrollY;
+
+        // Transitions smooth karne ke liye
+        logo.style.transition = "transform 0.4s ease, height 0.4s ease";
+
+        if (scrollValue > 40) {
+             // --- SHRINK STATE (Scroll karne par) ---
+           topBar.style.transform = `translateY(-${topBar.offsetHeight}px)`;
+            header.style.top = '0px';
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+            header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)'; 
+
+            // Padding kam rakhein taake header sleek lage
+            navWrapper.style.paddingTop = isMobile ? '10px' : '15px';
+            navWrapper.style.paddingBottom = isMobile ? '10px' : '15px';
+            
+            // Scroll par logo normal size mein aa jayega
+            logo.style.height = isMobile ? '50px' : '65px'; 
+            logo.style.transform = 'scale(1)';
+        } else {
+            // --- TOP STATE (Initial Position) ---
+             topBar.style.transform = 'translateY(0)';
+            header.style.top = '14px';
+            header.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'; 
+            header.style.boxShadow = 'none';
+
+
+            if (isMobile) {
+                navWrapper.style.paddingTop = '40px';
+                navWrapper.style.paddingBottom = '1px';
+                logo.style.height = '100px';
+                logo.style.transform = 'scale(1)';
+            } else {
+                // DESKTOP: Padding ko narrow rakha hai (sirf 20px)
+                // Lekin scale(1.9) se logo ko bada dikhaya hai bina header stretch kiye
+                navWrapper.style.paddingTop = '50px'; 
+                navWrapper.style.paddingBottom = '50px';
+                
+                logo.style.height = '80px'; // Base height kam rakhi hai
+                logo.style.transformOrigin = 'left center'; // Logo left se expand hoga
+                logo.style.transform = 'scale(1.9)'; // Header height badhaye bina logo bada dikhega
+            }
+        }
+    }
+
+    // --- Desktop Click-to-Open Dropdown Logic ---
+    const triggers = document.querySelectorAll('.dropdown-trigger');
+    triggers.forEach(trigger => {
+        trigger.addEventListener('click', function(e) {
+            const menu = this.querySelector('.bob-dropdown');
+            const arrow = this.querySelector('.arrow-icon');
+            
+            if(!menu) return;
+
+            const isActive = menu.classList.contains('dropdown-active');
+
+            // Pehle baaki sab band karein
+            document.querySelectorAll('.bob-dropdown').forEach(m => m.classList.remove('dropdown-active'));
+            document.querySelectorAll('.arrow-icon').forEach(a => a.classList.remove('rotate-180'));
+
+            if (!isActive) {
+                menu.classList.add('dropdown-active');
+                if (arrow) arrow.classList.add('rotate-180');
+            }
+            e.stopPropagation();
+        });
+    });
+
+    // Bahar click karne par band karein
+    window.addEventListener('click', () => {
+        document.querySelectorAll('.bob-dropdown').forEach(m => m.classList.remove('dropdown-active'));
+        document.querySelectorAll('.arrow-icon').forEach(a => a.classList.remove('rotate-180'));
+    });
+
+    // --- Mobile Sidebar Logic ---
+    const openBtn = document.getElementById('open-sidebar');
+    const closeBtn = document.getElementById('close-sidebar');
+
+    if(openBtn && sidebar) {
+        openBtn.onclick = () => {
+            sidebar.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+    }
+    if(closeBtn && sidebar) {
+        closeBtn.onclick = () => {
+            sidebar.classList.remove('open');
+            document.body.style.overflow = 'auto';
+        };
+    }
+
+    // --- Mobile Sub-menu Logic ---
+    const mobAboutTrigger = document.getElementById('mobile-about-trigger');
+    const mobAboutMenu = document.getElementById('mobile-about-menu');
+    if(mobAboutTrigger) {
+        mobAboutTrigger.onclick = (e) => {
+            e.preventDefault();
+            mobAboutMenu.classList.toggle('show');
+        };
+    }
+
+    const mobEventsTrigger = document.getElementById('mobile-events-trigger');
+    const mobEventsMenu = document.getElementById('mobile-events-menu');
+    if(mobEventsTrigger) {
+        mobEventsTrigger.onclick = (e) => {
+            e.preventDefault();
+            mobEventsMenu.classList.toggle('show');
+        };
+    }
+
+    window.addEventListener('resize', updateHeaderStyle);
+    window.addEventListener('scroll', updateHeaderStyle);
+    updateHeaderStyle();
+}
+
+// --- Initialization Logic ---
+document.addEventListener('DOMContentLoaded', () => {
+    const loader = document.getElementById('header-loader');
+    if(loader) {
+        fetch('header1.html')
+            .then(res => res.text())
+            .then(data => {
+                loader.innerHTML = data;
+                setTimeout(initializeHeader, 100);
+            })
+            .catch(err => console.error("Header load failure:", err));
+    } else {
+        initializeHeader();
+    }
+});
+</script>
+  <section class="mt-40 w-full bg-white py-20 px-6 md:px-10">
+    <div class="max-w-[800px] mx-auto text-center">
+
+      <h1 class="text-[32px] md:text-[45px] font-semibold uppercase  text-black mb-4">
+        Our Story
+      </h1>
+
+      <div class="w-16 h-[1px] bg-gray-300 mx-auto mb-12"></div>
+
+      <div class="text-left flex flex-col gap-8 text-[18px] md:text-[20px] text-[#000000] leading-relaxed">
+        <p>
+          Founded in April 2025, the idea of <span class="italic">Band of Brothers</span> quickly emerged during a difficult period for our founding member (Jim), troubled by grief, anxiety and depression. Knowing he couldnt be the only man to experience homelessness, addictions and separation, he began talking to friends about the idea of holding regular meet ups, helping one another through lifes challenges.
+        </p>
+
+        <p>
+          Quickly appreciating the idea, John and Jim, friends for nearly 25 years, took to the streets of Carshalton Beeches, to walk 4 miles, discussing everyday things, including family, work and COVID conspiracy theories. Enjoying their time together, they decided to trial it for 6 weeks, posting about the walks online, which saw more men join, including Ben and Matt.
+        </p>
+
+        <p>
+          In June 2025, <span class="italic">Band of Brothers</span> became registered as a Community Interest Company (CIC); a private company for public benefit. Quickly establishing a Board of Trustees, they got to work in setting out our Key principles, to help govern what and who we are today. As a grassroots, peer to peer supportive community, set up by local men for local men, we have maintained our original concept of being built on connection, social inclusion and emotional resilience, focusing on mental health, wellbeing and a shared commitment to positive change.
+        </p>
+
+        <p>
+          We currently operate throughout the London Borough of Sutton, but through a network of collaborative partners, have some exciting opportunities for growth in 2026.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Slider Section After Our Story -->
+ <section class="w-full bg-[#0b0b0b] text-[#3A6699] py-14 px-4">
+  <div class="max-w-[1250px] mx-auto">
+
+    <!-- Heading -->
+    <h2 class="text-center text-[38px] md:text-[46px] font-bold uppercase tracking-tight">
+      See more from our Member Events:
+    </h2>
+    <div class="w-16 h-[1px] bg-white/20 mx-auto mt-4 mb-10"></div>
+
+    <!-- Slider Card -->
+    <div class="bg-[#0a0a0a] p-4 md:p-6 shadow-2xl">
+
+      <!-- Slider Wrapper -->
+      <div class="relative group">
+
+        <!-- Viewport -->
+        <div id="viewport" class="overflow-hidden">
+          <div id="track"
+            class="flex items-center transition-transform duration-500 ease-out will-change-transform">
+            <!-- Slides injected by JS -->
+          </div>
+        </div>
+
+        <!-- LEFT ARROW -->
+        <button id="prevBtn"
+          class="absolute left-0 top-1/2 -translate-y-1/2
+                 w-9 h-16
+                 bg-black/20
+                 flex items-center justify-center
+                 opacity-0 group-hover:opacity-100
+                 transition-all duration-300 z-10">
+
+          <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26" class="text-white">
+            <path fill-rule="evenodd"
+              d="M15.836 19.774c.335.294.84.04.84-.423l.02-14.813c.001-.447-.48-.698-.81-.425l-8.693 7.204a.56.56 0 0 0-.01.836l8.653 7.621z">
+            </path>
+          </svg>
+        </button>
+
+        <!-- RIGHT ARROW -->
+        <button id="nextBtn"
+          class="absolute right-0 top-1/2 -translate-y-1/2
+                w-9 h-16
+                 bg-black/20
+                 flex items-center justify-center
+                 opacity-0 group-hover:opacity-100
+                 transition-all duration-300 z-10">
+
+          <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26" class="text-white">
+            <path fill-rule="evenodd"
+              d="M7.861 4.125c-.335-.293-.84-.039-.84.424L7 19.362c0 .446.481.697.811.424l8.693-7.203a.56.56 0 0 0 .011-.836L7.861 4.125z">
+            </path>
+          </svg>
+        </button>
+
+      </div>
+
+      <!-- Caption -->
+      <p id="caption" class="text-center text-sm md:text-base text-gray-400 mt-5">
+        Caption here
+      </p>
+
+      <!-- Thumbnails -->
+      <div id="thumbRow"
+        class="noScrollBar mt-5 flex gap-1 overflow-x-auto pb-2 justify-start">
+        <!-- Thumbs injected by JS -->
+      </div>
+
+    </div>
+  </div>
+</section>
+<script>
+ const slides = [
+    { src: "../images/slide1.webp", caption: "Taken in September 2025, from our 'Carshalton Beeches chapter'." },
+    { src: "./images/slide2.webp", caption: "Taken in July 2025, from our 'Carshalton Beeches chapter'." },
+    { src: "./images/slide3.webp", caption: "Taken in August 2025, from our 'Carshalton Beeches chapter'." },
+    { src: "./images/slide4.webp", caption: "Taken in April 2025, from our 'Carshalton Beeches chapter'." },
+    { src: "./images/slide5.webp", caption: "Taken in June 2025, from our 'Carshalton Beeches chapter'." },
+    { src: "./images/slide6.webp", caption: "Taken in June 2025, from our 'Carshalton Beeches chapter'." }
+];
+
+const track = document.getElementById("track");
+const captionEl = document.getElementById("caption");
+const thumbRow = document.getElementById("thumbRow");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+let index = 1; 
+let slideWidthPx = 0;
+let gapPx = 20;
+let isTransitioning = false;
+let autoPlayInterval;
+
+function buildSlides() {
+    track.innerHTML = "";
+    const lastClone = slides[slides.length - 1];
+    track.appendChild(createSlide(lastClone, 'clone-last'));
+    slides.forEach((s, i) => {
+        track.appendChild(createSlide(s, i));
+    });
+    const firstClone = slides[0];
+    track.appendChild(createSlide(firstClone, 'clone-first'));
+}
+
+function createSlide(s, i) {
+    const slide = document.createElement("div");
+    slide.className = "shrink-0 flex items-center justify-center";
+    slide.innerHTML = `
+      <div class="slideCard relative overflow-hidden transition-all duration-500 ease-out">
+        <img src="${s.src}" alt="slide" class="w-full h-full object-cover select-none pointer-events-none" draggable="false">
+      </div>
+    `;
+    return slide;
+}
+
+function buildThumbs() {
+    thumbRow.innerHTML = "";
+    slides.forEach((s, i) => {
+        const btn = document.createElement("button");
+        btn.className = "thumb shrink-0 w-[78px] h-[52px] md:w-[70px] md:h-[60px] overflow-hidden border-2 border-transparent opacity-50 hover:opacity-100 transition";
+        btn.innerHTML = `<img src="${s.src}" class="w-full h-full object-cover" alt="thumb ${i + 1}" draggable="false">`;
+        btn.addEventListener("click", () => {
+            if (isTransitioning) return;
+            index = i + 1;
+            translateToIndex(true);
+            resetAutoPlay();
+        });
+        thumbRow.appendChild(btn);
+    });
+}
+
+function computeSizes() {
+    const viewport = document.getElementById("viewport");
+    const vw = viewport.clientWidth;
+    const isMobile = window.innerWidth < 768;
+
+    const slideW = isMobile ? 0.90 : 0.65; // Mobile par width thodi barhadi
+    slideWidthPx = Math.round(vw * slideW);
+    gapPx = isMobile ? 8 : 10; 
+
+    const slideWrappers = track.children;
+    for (let i = 0; i < slideWrappers.length; i++) {
+        slideWrappers[i].style.width = (slideWidthPx + gapPx) + "px";
+        const card = slideWrappers[i].querySelector(".slideCard");
+        card.style.width = slideWidthPx + "px";
+        card.style.height = (isMobile ? "200px" : "520px");
+    }
+}
+
+function setActiveStyles() {
+    const slideWrappers = track.children;
+    let activeIndex = index - 1;
+    if (index === 0) activeIndex = slides.length - 1;
+    if (index === slides.length + 1) activeIndex = 0;
+
+    for (let i = 0; i < slideWrappers.length; i++) {
+        const card = slideWrappers[i].querySelector(".slideCard");
+        if (i === index) {
+            card.style.filter = "brightness(1)";
+            card.style.zIndex = "10";
+        } else {
+            card.style.filter = "brightness(0.35)";
+            card.style.zIndex = "1";
+        }
+    }
+
+    const thumbs = thumbRow.querySelectorAll(".thumb");
+    thumbs.forEach((t, i) => {
+        if (i === activeIndex) {
+            t.style.borderColor = "#3A6699"; 
+            t.style.opacity = "1";
+        } else {
+            t.style.borderColor = "transparent";
+            t.style.opacity = "0.5";
+        }
+    });
+
+    captionEl.textContent = slides[activeIndex].caption;
+}
+
+function translateToIndex(animate = true) {
+    const viewport = document.getElementById("viewport");
+    const vw = viewport.clientWidth;
+    
+    if (animate) {
+        track.style.transition = "transform 0.5s ease-out";
+        isTransitioning = true;
+    } else {
+        track.style.transition = "none";
+    }
+
+    const step = slideWidthPx + gapPx;
+    const centerOffset = (vw - slideWidthPx) / 2;
+    const x = -(index * step) + centerOffset;
+    
+    track.style.transform = `translateX(${x}px)`;
+    setActiveStyles();
+    
+    let activeIndex = index - 1;
+    if (index === 0) activeIndex = slides.length - 1;
+    if (index === slides.length + 1) activeIndex = 0;
+    keepThumbInView(activeIndex);
+}
+
+track.addEventListener('transitionend', () => {
+    isTransitioning = false;
+    if (index === 0) {
+        index = slides.length;
+        translateToIndex(false);
+    }
+    if (index === slides.length + 1) {
+        index = 1;
+        translateToIndex(false);
+    }
+});
+
+function keepThumbInView(activeIndex) {
+    const thumbs = thumbRow.querySelectorAll(".thumb");
+    const t = thumbs[activeIndex];
+    if (!t || window.innerWidth < 768) return; // Mobile par skip
+    const left = t.offsetLeft;
+    const right = left + t.offsetWidth;
+    const viewLeft = thumbRow.scrollLeft;
+    const viewRight = viewLeft + thumbRow.clientWidth;
+    if (left < viewLeft) thumbRow.scrollTo({ left: left - 16, behavior: "smooth" });
+    if (right > viewRight) thumbRow.scrollTo({ left: right - thumbRow.clientWidth + 16, behavior: "smooth" });
+}
+
+// --- AUTO PLAY LOGIC ---
+function startAutoPlay() {
+    autoPlayInterval = setInterval(() => {
+        if (!isTransitioning) {
+            goTo(index + 1);
+        }
+    }, 4000); // 4 seconds delay
+}
+
+function resetAutoPlay() {
+    clearInterval(autoPlayInterval);
+    startAutoPlay();
+}
+
+function goTo(i) {
+    if (isTransitioning) return;
+    index = i;
+    translateToIndex(true);
+}
+
+prevBtn.addEventListener("click", () => { goTo(index - 1); resetAutoPlay(); });
+nextBtn.addEventListener("click", () => { goTo(index + 1); resetAutoPlay(); });
+
+window.addEventListener("resize", () => {
+    computeSizes();
+    translateToIndex(false);
+});
+
+// Pause on Hover
+const mainViewport = document.getElementById("viewport");
+mainViewport.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+mainViewport.addEventListener('mouseleave', startAutoPlay);
+
+function init() {
+    buildSlides();
+    buildThumbs();
+    computeSizes();
+    translateToIndex(false);
+    startAutoPlay();
+}
+
+init();
+</script>
+ <footer class="w-full bg-[#335E90] text-white py-16 px-6">
+    <div class="max-w-[1200px] mx-auto flex flex-col items-center text-center">
+        
+        <div class="flex flex-wrap justify-center gap-4 md:gap-10 text-[13px] md:text-[15px]  uppercase tracking-widest mb-12">
+            <a href="safeguarding-policy.html" class="hover:opacity-80 transition-opacity">Safeguarding Policy</a>
+            <a href="policy.html" class="hover:opacity-80 transition-opacity">EQ&I Policy</a>
+            <a href="safety-policy.html" class="hover:opacity-80 transition-opacity">Health & Safety Policy</a>
+        </div>
+
+  <div class="flex items-center gap-6 mb-12">
+
+  <a href="https://www.facebook.com/bandofbrotherscic/"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-facebook-f text-sm"></i>
+  </a>
+
+  <a href="https://www.instagram.com/bandofbrotherscic/#"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-instagram text-sm"></i>
+  </a>
+
+  <a href="https://www.linkedin.com/company/band-of-brothers-cic/"
+     class="w-6 h-6 flex items-center justify-center rounded-full bg-white text-[#1b5b88] hover:scale-110 transition-all shadow-md">
+    <i class="fab fa-linkedin-in text-sm"></i>
+  </a>
+
+</div>
+
+
+        <p class="text-[13px] md:text-[16px] leading-relaxed max-w-[1150px] mb-8 opacity-90">
+           <em>'Band of Brothers Community Interest Company'</em>
+ is a registered company with 'Companies House' (in England and Wales) 
+            and is approved by the 'CIC Regulator' [Company Registration: 16528876].
+        </p>
+
+        <div class="text-[12px] md:text-[15px] italic">
+            <p class="mb-1 text-medium italic ">Copyright © 2026. 'Band of Brothers CIC'.</p>
+            <p class="mb-1 text-medium italic ">All Rights Reserved.</p>
+        </div>
+
+    </div>
+</footer>
+</body>
+</html>
