@@ -161,15 +161,20 @@ body {
 
 // --- Initialization Logic ---
 document.addEventListener('DOMContentLoaded', () => {
-    const loader = document.getElementById('../header-loader');
+    const loader = document.getElementById('header-loader');
     if(loader) {
-        fetch('header1.html')
-            .then(res => res.text())
-            .then(data => {
-                loader.innerHTML = data;
-                setTimeout(initializeHeader, 100);
-            })
-            .catch(err => console.error("Header load failure:", err));
+       fetch('header1.html')
+  .then(res => {
+      if(!res.ok) throw new Error('Header fetch failed');
+      return res.text();
+  })
+  .then(data => {
+      document.getElementById('header-loader').innerHTML = data;
+      initializeHeader();  // Direct call, setTimeout unnecessary
+  })
+  .catch(err => console.error(err));
+
+           
     } else {
         initializeHeader();
     }
