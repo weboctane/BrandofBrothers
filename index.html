@@ -163,13 +163,17 @@ body {
 document.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById('header-loader');
     if(loader) {
-        fetch('header1.html')
+        fetch('/header1.html')
             .then(res => res.text())
             .then(data => {
                 loader.innerHTML = data;
                 setTimeout(initializeHeader, 100);
             })
-            .catch(err => console.error("Header load failure:", err));
+            .catch(err => {
+  console.error("Header load failure:", err);
+  loader.innerHTML = "<div style='padding:12px;color:red'>Header file not found</div>";
+});
+
     } else {
         initializeHeader();
     }
