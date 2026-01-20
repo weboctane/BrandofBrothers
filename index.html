@@ -159,26 +159,267 @@ body {
     updateHeaderStyle();
 }
 
-// --- Initialization Logic ---
-document.addEventListener('DOMContentLoaded', () => {
-    const loader = document.getElementById('header-loader');
-    if(loader) {
-        fetch('/header1.html')
-            .then(res => res.text())
-            .then(data => {
-                loader.innerHTML = data;
-                setTimeout(initializeHeader, 100);
-            })
-            .catch(err => {
-  console.error("Header load failure:", err);
-  loader.innerHTML = "<div style='padding:12px;color:red'>Header file not found</div>";
-});
 
-    } else {
-        initializeHeader();
-    }
-});
 </script>
+<style>
+   /* 1. Reset & Smooth Motion for Header Elements */
+#main-header, #top-bar, #nav-wrapper, #header-logo {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 2. Desktop Dropdown - Image Match Clean Style */
+.bob-dropdown {
+    display: none;
+    position: absolute;
+    background: #ffffff; 
+    
+    /* Image ke mutabiq wide aur clean layout */
+    width: 210px; 
+    
+    /* Elegant soft shadow jo image mein dikh rahi hai */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    
+    top: 100%;
+    left: 0;
+    padding: 20px 10px;
+    
+    /* Slight rounding for a modern feel */
+    border-radius: 2px; 
+    z-index: 50;
+    
+    /* Very light border to define edges */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    
+    /* Dropdown animation */
+    animation: fadeInSlide 0.2s ease-out forwards;
+}
+
+/* Dropdown visibility logic */
+.nav-group:hover .bob-dropdown { 
+    display: block; 
+}
+
+/* Individual Links inside Dropdown */
+.bob-dropdown a {
+    display: block;
+    /* Pehla number (6px) vertical gap control karta hai */
+    /* Dusra number (20px) horizontal gap control karta hai */
+    padding: 6px 20px !important; 
+    
+    color: #444 !important;
+    text-transform: none !important;
+    font-size: 15px;
+    font-weight: 400;
+    transition: all 0.2s ease;
+    line-height: 1.2; /* Line height kam karne se bhi gap mazeed kam ho jata hai */
+}
+/* Hover effect for Dropdown Links */
+
+
+/* 3. Mobile Sidebar Styling */
+#mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #161616;
+    z-index: 99999;
+    transform: translateX(-100%);
+    transition: transform 0.4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+#mobile-sidebar.open { 
+    transform: translateX(0); 
+}
+
+/* 4. Mobile Submenu (Dropdowns in Mobile) */
+.mobile-submenu {
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+    padding-left: 10px;
+    margin-top: 15px;
+    border-left: 1px solid #333; /* Visual guide for sub-items */
+}
+
+.mobile-submenu.show { 
+    display: flex; 
+}
+
+.hover\:text-light-blue-400:hover {
+    color: #63b3ed; /* Light blue accent for mobile */
+}
+
+/* 5. Animations */
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header Shrink Classes (Managed via JS) */
+.header-scrolled {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+/* Nav links ke andar SVG ko rotate karne ke liye */
+.nav-group a svg {
+    transition: transform 0.3s ease;
+}
+
+/* Hover par arrow (SVG) upar move karega */
+.nav-group:hover a svg {
+    transform: rotate(180px);
+}
+
+.bob-dropdown {
+    display: none;
+    position: absolute;
+    background: #ffffff; 
+    width: 210px; 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    top: 100%;
+    left: 0;
+    /* Top aur bottom padding kam ki hai image ke mutabiq */
+    padding: 10px 0; 
+    border-radius: 2px; 
+    z-index: 50;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    animation: fadeInSlide 0.2s ease-out forwards;
+}
+
+.bob-dropdown a {
+    display: block;
+    /* Vertical gap tight karne ke liye padding kam ki */
+    padding: 5px 20px !important; 
+    color: #444 !important;
+    text-transform: none !important;
+    font-size: 15px;
+    font-weight: 400;
+    transition: all 0.2s ease;
+    line-height: 1.4;
+}
+#top-bar{
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+</style>
+<div id="top-bar" class="fixed top-0 w-full bg-[#335E90] text-white py-2 md:py-2 z-[1001]">
+    <div class="max-w-[1200px] mx-auto px-4 flex items-center justify-center gap-3 md:gap-4 text-[17px] md:text-[18px] text-center">
+        
+        <svg viewBox="0 0 35 35" class="w-5 h-5 md:w-6 md:h-6 shrink-0 fill-none stroke-current opacity-90">
+            <path stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M16.724 10.726l4.651 5.349M12.03 16.408L16.8 21.8M16.8 1.8v28M30.8 16.3h-28M15.8 1.3a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM30.3 16.3a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM1.3 16.3a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM15.8 30.8a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM23.05 10.05l-12.5 12.5M22.6 9.3a1 1 0 1 1 1.999-.002A1 1 0 0 1 22.6 9.3zM8.8 23.3a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM16.99 5.545l10.02 10.961M17 27.3l-10.7-11M27.01 16.131l-10.02 10.96M6.59 17.091l10.02-10.96M22.925 22.086L10.688 9.328M22.459 22.826a1 1 0 1 0 2 .043 1 1 0 0 0-2-.043zM8.953 8.542a1.001 1.001 0 1 0 2.002.04 1.001 1.001 0 0 0-2.002-.04z"></path>
+        </svg>
+
+        <span class="leading-tight tracking-wide max-w-[200px] md:max-w-none" style="font-size: 18px;">
+  Help fundraise for 'Band of Brothers' today!
+</span>
+
+
+        <svg viewBox="0 0 35 35" class="w-5 h-5 md:w-6 md:h-6 shrink-0 fill-none stroke-current opacity-90">
+            <path stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M16.724 10.726l4.651 5.349M12.03 16.408L16.8 21.8M16.8 1.8v28M30.8 16.3h-28M15.8 1.3a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM30.3 16.3a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM1.3 16.3a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM15.8 30.8a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM23.05 10.05l-12.5 12.5M22.6 9.3a1 1 0 1 1 1.999-.002A1 1 0 0 1 22.6 9.3zM8.8 23.3a1 1 0 1 1 1.999 0 1 1 0 0 1-2 0zM16.99 5.545l10.02 10.961M17 27.3l-10.7-11M27.01 16.131l-10.02 10.96M6.59 17.091l10.02-10.96M22.925 22.086L10.688 9.328M22.459 22.826a1 1 0 1 0 2 .043 1 1 0 0 0-2-.043zM8.953 8.542a1.001 1.001 0 1 0 2.002.04 1.001 1.001 0 0 0-2.002-.04z"></path>
+        </svg>
+
+    </div>
+</div>
+<header id="main-header" class="header-transparent fixed w-full z-[1000]">
+    <div id="nav-wrapper" class="max-w-[1400px] mx-auto px-6 flex items-center justify-between py-4 lg:py-16 transition-all duration-300">
+        <a href="index.html">
+            <img src="https://img1.wsimg.com/isteam/ip/20ddf7a0-7ab7-48af-9538-75a145fa22e7/Bands%20Of%20Brothers%20Horizontal%20Logo%20Final.png/:/rs=h:210,cg:true,m/qt=q:95" 
+                 id="header-logo" class="h-32 w-auto object-contain">
+        </a>
+
+        <nav class="hidden lg:flex items-center gap-7 text-[14px] uppercase tracking-[2px] text-black">
+            <a href="index.html">Home</a>
+           <div class="nav-group relative py-2 cursor-pointer">
+    <a class="flex items-center gap-1">
+        ABOUT US 
+        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" class="opacity-70">
+            <path fill-rule="evenodd" d="M19.774 7.86c.294-.335.04-.839-.423-.84L4.538 7c-.447-.001-.698.48-.425.81l7.204 8.693a.56.56 0 0 0 .836.011l7.621-8.654z"></path>
+        </svg>
+    </a>
+    <div class="bob-dropdown">
+        <a href="ourstory.html">Our Story</a>
+        <a href="our-pledge.html">Our Pledge</a>
+        <a href="charitable-purpose.html">Charitable Purpose</a>
+        <a href="meet-our-team.html">Meet Our Team</a>
+        <a href="partnerships.html">Partnerships</a>
+        <a href="get-involved.html">Get Involved</a>
+    </div>
+</div>
+            <a href="get-help.html">Get Help</a>
+
+            <div class="nav-group relative py-2 cursor-pointer">
+    <a class="flex items-center gap-1">
+        OUR EVENTS 
+        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" class="opacity-70">
+            <path fill-rule="evenodd" d="M19.774 7.86c.294-.335.04-.839-.423-.84L4.538 7c-.447-.001-.698.48-.425.81l7.204 8.693a.56.56 0 0 0 .836.011l7.621-8.654z"></path>
+        </svg>
+    </a>
+    <div class="bob-dropdown">
+        <a href="our-events.html">Our Events</a>
+    </div>
+</div>
+             <a href="news.html">NEWS</a>
+            <a href="contact-us.html">Contact Us</a>
+        </nav>
+
+        <button id="open-sidebar" class="lg:hidden text-3xl">☰</button>
+    </div>
+</header>
+
+<div id="mobile-sidebar">
+    <div class="flex justify-end">
+        <button id="close-sidebar" class="text-white text-5xl font-light">&times;</button>
+    </div>
+    <nav class="px-5 flex flex-col gap-10  text-white text-xl font-semibold tracking-tight ">
+        <a href="index.html" class="hover:text-light-blue-400">Home</a>
+        
+        <div>
+            <div id="mobile-about-trigger" class="flex justify-between items-center cursor-pointer">
+                About Us <span class="text-sm"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" data-ux="Icon" class="x-el x-el-svg c2-1 c2-2 c2-y c2-z c2-1g c2-2l c2-1i c2-1j c2-1z c2-20 c2-21 c2-3 c2-1r c2-1u c2-1w c2-1x c2-1y"><path fill-rule="evenodd" d="M19.774 7.86c.294-.335.04-.839-.423-.84L4.538 7c-.447-.001-.698.48-.425.81l7.204 8.693a.56.56 0 0 0 .836.011l7.621-8.654z"></path></svg></span>
+            </div>
+            <div id="mobile-about-menu" class="mobile-submenu text-gray-400 text-sm">
+                <a href="ourstory.html" class="block hover:text-light-blue-400">Our Story</a>
+                <a href="our-pledge.html" class="block hover:text-light-blue-400">Our Pledge</a>
+                <a href="charitable-purpose.html" class="block hover:text-light-blue-400">Our Charitable Purpose</a>
+                <a href="meet-our-team.html" class="block hover:text-light-blue-400">Meet Our Team</a>
+                <a href="partnerships.html" class="block hover:text-light-blue-400">Partnerships</a>
+                <a href="get-involved.html" class="block hover:text-light-blue-400">Get Involved</a>
+            </div>
+        </div>
+
+        <div>
+            <div id="mobile-events-trigger" class="flex justify-between items-center cursor-pointer">
+                Our Events <span class="text-sm"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" data-ux="Icon" class="x-el x-el-svg c2-1 c2-2 c2-y c2-z c2-1g c2-2l c2-1i c2-1j c2-1z c2-20 c2-21 c2-3 c2-1r c2-1u c2-1w c2-1x c2-1y"><path fill-rule="evenodd" d="M19.774 7.86c.294-.335.04-.839-.423-.84L4.538 7c-.447-.001-.698.48-.425.81l7.204 8.693a.56.56 0 0 0 .836.011l7.621-8.654z"></path></svg></span>
+            </div>
+            <div id="mobile-events-menu" class="mobile-submenu text-gray-400 text-lg">
+                <a href="our-events.html" class="block py-2 hover:text-light-blue-400">Our Events</a>
+            </div>
+        </div>
+
+        <a href="get-help.html" class="hover:text-light-blue-400">GET HELP</a>
+        <a href="contact-us.html" class="hover:text-light-blue-400">Contact Us</a>
+    </nav>
+</div>
+
+<!-- Tailwind custom styles -->
+<style>
+    /* Adjusting the hover effect color */
+    .hover\:text-light-blue-400:hover {
+        color: #63b3ed; /* Light blue */
+    }
+</style>
 
 <section id="hero" class="relative w-full h-[550px] md:h-[700px] flex flex-col items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0">
